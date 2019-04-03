@@ -35,22 +35,6 @@ dependencies {
 }
 
 jar {
-    doLast {
-        copy {
-            from jar
-            into 'E:/Steam/steamapps/common/Wurm Unlimited/WurmServerLauncher/mods/' + $shortName
-        }
-
-        copy {
-            from sourceSets.main.output.resourcesDir
-            into 'E:/Steam/steamapps/common/Wurm Unlimited/WurmServerLauncher/mods/'
-        }
-    }
-
-    from {
-        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
-    }
-
     exclude "*.properties"
     archiveName $shortName + '.jar'
 
@@ -60,11 +44,11 @@ jar {
 }
 
 task zip(type: Zip) {
-    into($shortName + "/" + $shortName) {
+    into("mods/" + $shortName) {
         from jar
     }
 
-    into($shortName) {
+    into("mods/") {
         from sourceSets.main.output.resourcesDir
     }
 
