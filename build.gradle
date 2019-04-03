@@ -1,0 +1,72 @@
+plugins {
+    id 'java'
+}
+
+group 'mod.wurmunlimited.discord'
+version '0.1'
+def $shortName = "customchatextension"
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    provided
+    provided.extendsFrom(implementation)
+}
+
+sourceSets {
+    main {
+        compileClasspath += configurations.provided
+    }
+    test {
+        compileClasspath += configurations.provided
+    }
+}
+
+dependencies {
+    testCompile 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+    testCompile 'org.junit.platform:junit-platform-runner:1.1.0'
+    testCompile "org.mockito:mockito-inline:2.+"
+    provided fileTree(dir: 'E:/Steam/steamapps/common/Wurm Unlimited/WurmServerLauncher/', includes: ["modlauncher.jar", "javassist.jar", "server.jar"])
+    provided fileTree(dir: "libs")
+}
+
+jar {
+    doLast {
+        copy {
+            from jar
+            into 'E:/Steam/steamapps/common/Wurm Unlimited/WurmServerLauncher/mods/' + $shortName
+        }
+
+        copy {
+            from sourceSets.main.output.resourcesDir
+            into 'E:/Steam/steamapps/common/Wurm Unlimited/WurmServerLauncher/mods/'
+        }
+    }
+
+    from {
+        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
+    }
+
+    exclude "*.properties"
+    archiveName $shortName + '.jar'
+
+    manifest {
+        attributes('Implementation-Version': version)
+    }
+}
+
+task zip(type: Zip) {
+    into($shortName + "/" + $shortName) {
+        from jar
+    }
+
+    into($shortName) {
+        from sourceSets.main.output.resourcesDir
+    }
+
+    archiveName = $shortName + '.zip'
+}
